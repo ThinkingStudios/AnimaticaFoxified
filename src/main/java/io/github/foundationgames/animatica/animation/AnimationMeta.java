@@ -22,10 +22,10 @@ public record AnimationMeta(
         Identifier source;
         Identifier target;
         try {
-            source = Utilities.processPath(file, new Identifier(PropertyUtil.get(file, properties, "from")));
+            source = Utilities.processPath(file, Identifier.of(PropertyUtil.get(file, properties, "from")));
         } catch (InvalidIdentifierException ex) { throw new InvalidPropertyException(file, "from", "resource location"); }
         try {
-            target = Utilities.processPath(file, new Identifier(PropertyUtil.get(file, properties, "to")));
+            target = Utilities.processPath(file, Identifier.of(PropertyUtil.get(file, properties, "to")));
         } catch (InvalidIdentifierException ex) { throw new InvalidPropertyException(file, "to", "resource location"); }
         return new AnimationMeta(
                 source,
