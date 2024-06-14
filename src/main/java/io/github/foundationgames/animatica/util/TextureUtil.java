@@ -1,9 +1,12 @@
 package io.github.foundationgames.animatica.util;
 
+import io.github.foundationgames.animatica.mixin.NativeImageAccessor;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.system.MemoryUtil;
 
 public enum TextureUtil {;
+    private static final long SIZEOF_INT = 4;
 
     /**
      * Copy a section of an image into another image
@@ -18,20 +21,20 @@ public enum TextureUtil {;
      * @param dv The v coordinate on the destination image to place the selection at
      */
     public static void copy(NativeImage src, int u, int v, int w, int h, NativeImage dest, int du, int dv) {
-        // iterate through the entire section of the image to be copied over
-        for (int rx = 0; rx < w; rx++) {
-            for (int ry = 0; ry < h; ry++) {
-                // the current x/y coordinates in the source image
-                int srcX = u + rx;
-                int srcY = v + ry;
-                // the corresponding target x/y coordinates in the target image
-                int trgX = du + rx;
-                int trgY = dv + ry;
+        w = MathHelper.clamp(dest.getWidth() - du, 0, w);
+        h = MathHelper.clamp(dest.getHeight() - dv, 0, h);
 
-                // set the color of the target pixel on the destination image
-                // to the color from the corresponding pixel on the source image
-                dest.setColor(trgX, trgY, src.getColor(srcX, srcY));
-            }
+        long srcPtr = ((NativeImageAccessor)(Object)src).getPointer();
+        long dstPtr = ((NativeImageAccessor)(Object)dest).getPointer();
+
+        for (int row = 0; row < h; row++) {
+            int srcRowIdx = ((v + row) * src.getWidth()) + u;
+            var srcRow = MemoryUtil.memIntBuffer(srcPtr + (srcRowIdx * SIZEOF_INT), w);
+
+            int trgRowIdx = ((dv + row) * dest.getWidth()) + du;
+            var trgRow = MemoryUtil.memIntBuffer(dstPtr + (trgRowIdx * SIZEOF_INT), w);
+
+            MemoryUtil.memCopy(srcRow, trgRow);
         }
     }
 
@@ -52,22 +55,24 @@ public enum TextureUtil {;
      *              second (0 = solid first image, 1 = solid second image)
      */
     public static void blendCopy(NativeImage src, int u0, int v0, int u1, int v1, int w, int h, NativeImage dest, int du, int dv, float blend) {
-        // iterate through the entire section of the image to be copied over
-        for (int rx = 0; rx < w; rx++) {
-            for (int ry = 0; ry < h; ry++) {
-                // the first set of x/y coordinates in the source image
-                int srcX0 = u0 + rx;
-                int srcY0 = v0 + ry;
-                // the second set of x/y coordinates in the source image
-                int srcX1 = u1 + rx;
-                int srcY1 = v1 + ry;
-                // the corresponding target x/y coordinates in the target image
-                int trgX = du + rx;
-                int trgY = dv + ry;
+        w = MathHelper.clamp(dest.getWidth() - du, 0, w);
+        h = MathHelper.clamp(dest.getHeight() - dv, 0, h);
 
-                // set the color of the target pixel on the destination image to a blend
-                // of the colors from the corresponding pixels on the source image
-                dest.setColor(trgX, trgY, lerpColor(src.getFormat(), src.getColor(srcX0, srcY0), src.getColor(srcX1, srcY1), blend));
+        long srcPtr = ((NativeImageAccessor)(Object)src).getPointer();
+        long dstPtr = ((NativeImageAccessor)(Object)dest).getPointer();
+
+        for (int row = 0; row < h; row++) {
+            int src0RowIdx = ((v0 + row) * src.getWidth()) + u0;
+            var src0Row = MemoryUtil.memIntBuffer(srcPtr + (src0RowIdx * SIZEOF_INT), w);
+
+            int src1RowIdx = ((v1 + row) * src.getWidth()) + u1;
+            var src1Row = MemoryUtil.memIntBuffer(srcPtr + (src1RowIdx * SIZEOF_INT), w);
+
+            int trgRowIdx = ((dv + row) * dest.getWidth()) + du;
+            var trgRow = MemoryUtil.memIntBuffer(dstPtr + (trgRowIdx * SIZEOF_INT), w);
+
+            for (int col = 0; col < w; col++) {
+                trgRow.put(col, lerpColor(src.getFormat(), src0Row.get(col), src1Row.get(col), blend));
             }
         }
     }
