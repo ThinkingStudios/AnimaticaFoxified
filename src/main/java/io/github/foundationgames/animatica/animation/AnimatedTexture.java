@@ -3,21 +3,31 @@ package io.github.foundationgames.animatica.animation;
 import com.google.common.collect.ImmutableList;
 import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.util.TextureUtil;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AnimatedTexture extends NativeImageBackedTexture {
+    public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
+
     public final Animation[] anims;
     private final NativeImage original;
     private int frame = 0;
+
+    private CompletableFuture<Void> frameWaitingOn = null;
 
     public static Optional<AnimatedTexture> tryCreate(ResourceManager resources, Identifier targetTexId, List<AnimationMeta> anims) {
         try (var targetTexResource = resources.getResourceOrThrow(targetTexId).getInputStream()) {
@@ -36,7 +46,7 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         }
         this.original = image;
 
-        updateAndDraw(this.getImage(), true);
+        updateAndDraw(this.getImage(), true, MinecraftClient.getInstance());
         this.upload();
     }
 
@@ -50,7 +60,15 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         return true;
     }
 
-    public boolean updateAndDraw(NativeImage image, boolean force) {
+    private @Nullable CompletableFuture<Void> getFrameWaitingOn() {
+        if (this.frameWaitingOn != null && this.frameWaitingOn.isDone()) {
+            this.frameWaitingOn = null;
+        }
+
+        return this.frameWaitingOn;
+    }
+
+    public void updateAndDraw(NativeImage image, boolean force, Executor exec) {
         boolean changed = false;
 
         if (canLoop()) {
@@ -69,16 +87,23 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         }
 
         if (changed || force) {
-            image.copyFrom(this.original);
+            // Skip if still waiting for a frame to finish
+            if (this.getFrameWaitingOn() == null) {
+                this.frameWaitingOn = CompletableFuture.supplyAsync(() -> {
+                    image.copyFrom(this.original);
 
-            Phase phase;
-            for (var anim : anims) {
-                phase = anim.getCurrentPhase();
-                if (phase instanceof InterpolatedPhase iPhase) {
-                    TextureUtil.blendCopy(anim.sourceTexture, 0, iPhase.prevV, 0, iPhase.v, anim.width, anim.height, image, anim.targetX, anim.targetY, iPhase.blend.getBlend(anim.getPhaseFrame()));
-                } else {
-                    TextureUtil.copy(anim.sourceTexture, 0, phase.v, anim.width, anim.height, image, anim.targetX, anim.targetY);
-                }
+                    Phase phase;
+                    for (var anim : anims) {
+                        phase = anim.getCurrentPhase();
+                        if (phase instanceof InterpolatedPhase iPhase) {
+                            TextureUtil.blendCopy(anim.sourceTexture, 0, iPhase.prevV, 0, iPhase.v, anim.width, anim.height, image, anim.targetX, anim.targetY, iPhase.blend.getBlend(anim.getPhaseFrame()));
+                        } else {
+                            TextureUtil.copy(anim.sourceTexture, 0, phase.v, anim.width, anim.height, image, anim.targetX, anim.targetY);
+                        }
+                    }
+
+                    return null;
+                }, exec).thenAccept(v -> MinecraftClient.getInstance().execute(this::upload));
             }
         }
 
@@ -86,14 +111,10 @@ public class AnimatedTexture extends NativeImageBackedTexture {
             anim.advance();
         }
         frame++;
-
-        return changed;
     }
 
     public void tick() {
-        if (this.updateAndDraw(this.getImage(), false)) {
-            this.upload();
-        }
+        this.updateAndDraw(this.getImage(), false, EXECUTORS);
     }
 
     @Override
