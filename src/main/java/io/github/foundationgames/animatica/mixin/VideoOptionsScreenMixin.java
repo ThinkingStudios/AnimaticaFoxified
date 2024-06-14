@@ -16,7 +16,7 @@ public abstract class VideoOptionsScreenMixin extends Screen {
     }
 
     @ModifyArg(
-            method = "init",
+            method = "addOptions",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/widget/OptionListWidget;addAll([Lnet/minecraft/client/option/SimpleOption;)V"

@@ -95,7 +95,7 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
         for (var targetId : animations.keySet()) {
             AnimatedTexture.tryCreate(manager, targetId, animations.get(targetId))
                     .ifPresent(tex -> {
-                        var animId = new Identifier(targetId.getNamespace(), targetId.getPath() + "-anim");
+                        var animId = Identifier.of(targetId.getNamespace(), targetId.getPath() + "-anim");
                         this.animationIds.put(targetId, animId);
                         this.animatedTextures.add(tex);
                         tex.registerTexture(MinecraftClient.getInstance().getTextureManager(), manager, animId, MinecraftClient.getInstance());
