@@ -1,87 +1,68 @@
 package io.github.foundationgames.animatica.config;
 
 import io.github.foundationgames.animatica.Animatica;
-import net.fabricmc.loader.api.FabricLoader;
+import me.jellysquid.mods.sodium.client.gui.options.OptionFlag;
+import me.jellysquid.mods.sodium.client.gui.options.OptionGroup;
+import me.jellysquid.mods.sodium.client.gui.options.OptionImpact;
+import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
+import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
+import me.jellysquid.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.SimpleOption;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Properties;
+import net.minecraft.text.Text;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class AnimaticaConfig {
-    public static String ANIMATED_TEXTURES_KEY = "animated_textures";
+    private static final ModConfigSpec.Builder BUILDER;
+    public static final ModConfigSpec.BooleanValue ANIMATED_TEXTURES;
+    public static final ModConfigSpec SPEC;
 
-    public static final String FILE_NAME = "animatica.properties";
+    static {
+        BUILDER = new ModConfigSpec.Builder();
+        BUILDER.push("animatica");
+        ANIMATED_TEXTURES = BUILDER.translation("option.animatica.animated_textures").define("animated_textures", true);
+        SPEC = BUILDER.build();
+    }
 
-    private final SimpleOption<Boolean> animatedTexturesOption;
-    public boolean animatedTextures;
+    public static class VanillaExtendedConfig {
+        private static final SimpleOption<Boolean> animatedTexturesOption;
 
-    public AnimaticaConfig() {
-        try {
-            load();
-        } catch (IOException e) {
-            Animatica.LOG.error("Error loading config during initialization!", e);
+        static {
+            animatedTexturesOption = SimpleOption.ofBoolean(
+                    "option.animatica.animated_textures",
+                    AnimaticaConfig.ANIMATED_TEXTURES.getAsBoolean(),
+                    value -> {
+                        AnimaticaConfig.ANIMATED_TEXTURES.set(value);
+                        MinecraftClient.getInstance().reloadResources();
+                    }
+            );
         }
 
-        this.animatedTexturesOption = SimpleOption.ofBoolean(
-                "option.animatica.animated_textures",
-                this.animatedTextures,
-                value -> {
-                    this.animatedTextures = value;
-                    try {
-                        this.save();
-                    } catch (IOException e) { Animatica.LOG.error("Error saving config while changing in game!", e); }
-                    MinecraftClient.getInstance().reloadResources();
-                }
-        );
-    }
-
-    public void writeTo(Properties properties) {
-        properties.put(ANIMATED_TEXTURES_KEY, Boolean.toString(animatedTextures));
-    }
-
-    public void readFrom(Properties properties) {
-        this.animatedTextures = boolFrom(properties.getProperty(ANIMATED_TEXTURES_KEY), true);
-    }
-
-    public Path getFile() throws IOException {
-        var file = FabricLoader.getInstance().getConfigDir().resolve(FILE_NAME);
-        if (!Files.exists(file)) {
-            Files.createFile(file);
-        }
-
-        return file;
-    }
-
-    public SimpleOption<Boolean> getAnimatedTexturesOption() {
-        return animatedTexturesOption;
-    }
-
-    public void save() throws IOException {
-        var file = getFile();
-        var properties = new Properties();
-
-        writeTo(properties);
-
-        try (var out = Files.newOutputStream(file)) {
-            properties.store(out, "Configuration file for Animatica");
+        public static SimpleOption<Boolean> getAnimatedTexturesOption() {
+            return animatedTexturesOption;
         }
     }
 
-    public void load() throws IOException {
-        var file = getFile();
-        var properties = new Properties();
+    public static class EmbeddiumExtendedConfig {
+        private static final SodiumOptionsStorage sodiumOpts = new SodiumOptionsStorage();
+        private static final OptionGroup animatedTextures;
 
-        try (var in = Files.newInputStream(file)) {
-            properties.load(in);
+        static {
+            animatedTextures = OptionGroup.createBuilder()
+                    .setId(Animatica.id("animated_textures"))
+                    .add(OptionImpl.createBuilder(Boolean.TYPE, sodiumOpts)
+                            .setName(Text.translatable("option.animatica.animated_textures"))
+                            .setTooltip(Text.of(""))
+                            .setControl(TickBoxControl::new)
+                            .setBinding((sodiumGameOptions, aBoolean) -> AnimaticaConfig.ANIMATED_TEXTURES.set(aBoolean), sodiumGameOptions -> AnimaticaConfig.ANIMATED_TEXTURES.get())
+                            .setImpact(OptionImpact.VARIES)
+                            .setFlags(new OptionFlag[]{OptionFlag.REQUIRES_ASSET_RELOAD})
+                            .build()
+                    ).build();
         }
 
-        readFrom(properties);
-    }
-
-    private static boolean boolFrom(String s, boolean defaultVal) {
-        return s == null ? defaultVal : "true".equals(s);
+        public static OptionGroup getAnimatedTextures() {
+            return animatedTextures;
+        }
     }
 }

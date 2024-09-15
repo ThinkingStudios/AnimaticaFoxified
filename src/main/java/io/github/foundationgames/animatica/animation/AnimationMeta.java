@@ -6,6 +6,8 @@ import io.github.foundationgames.animatica.util.exception.InvalidPropertyExcepti
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -18,7 +20,8 @@ public record AnimationMeta(
         int interpolationDelay, Map<Integer, Integer> frameMapping,
         Map<Integer, Integer> frameDurations
 ) {
-    public static AnimationMeta of(Identifier file, Properties properties) throws PropertyParseException {
+    @Contract("_, _ -> new")
+    public static @NotNull AnimationMeta of(Identifier file, Properties properties) throws PropertyParseException {
         Identifier source;
         Identifier target;
         try {
