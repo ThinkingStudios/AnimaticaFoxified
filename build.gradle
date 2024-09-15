@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id "dev.architectury.loom" version "1.7-SNAPSHOT"
 }
 
 sourceCompatibility = JavaVersion.VERSION_21
@@ -10,20 +10,26 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
+	maven { url "https://maven.neoforged.net/releases/" }
+	maven { url "https://maven.blamejared.com" }
 }
 
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	mappings loom.layered {
+		mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+		mappings "dev.architectury:yarn-mappings-patch-neoforge:${project.yarn_patch}"
+	}
+	neoForge "net.neoforged:neoforge:${project.neoforge_version}"
+
+	modCompileOnly("org.embeddedt:embeddium-1.21.1:1.0.12-beta.401+mc1.21.1")
 }
 
 processResources {
 	inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
+	filesMatching("META-INF/neoforge.mods.toml") {
 		expand "version": project.version
 	}
 }
