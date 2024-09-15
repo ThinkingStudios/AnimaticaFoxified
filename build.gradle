@@ -1,11 +1,9 @@
 plugins {
 	id "dev.architectury.loom" version "1.7-SNAPSHOT"
+	id "com.hypherionmc.modutils.modpublisher" version "2.+"
 }
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
-archivesBaseName = project.archives_base_name
+base.archivesName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
@@ -40,11 +38,34 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+
+	toolchain.languageVersion = JavaLanguageVersion.of(21)
+
 	withSourcesJar()
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${base.getArchivesName()}"}
 	}
+}
+
+publisher {
+	apiKeys {
+		modrinth System.getenv("MODRINTH_TOKEN")
+		curseforge System.getenv("CURSEFORGE_TOKEN")
+	}
+
+	setCurseID("${project.curseforge_id}")
+	setModrinthID("${project.modrinth_id}")
+	setVersionType("alpha")
+	setChangelog(file("CHANGELOG.md").getText("UTF-8"))
+	setVersion("${project.version}")
+	setDisplayName("${project.version}")
+	setGameVersions("1.21", "1.21.1")
+	setLoaders("neoforge")
+	setArtifact(remapJar)
+	addAdditionalFile(sourcesJar)
 }
