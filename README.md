@@ -11,9 +11,9 @@ This includes:
 - Animated armor textures
 - Other animated textures (Animated blocks and items are a vanilla feature)
 ## Animatica Foxified DOES NOT support:
-- Fully Custom GUI ([OptiGUI for Fabric](https://www.curseforge.com/minecraft/mc-mods/optigui))
-- Custom entity models ([CEM for Fabric](https://www.curseforge.com/minecraft/mc-mods/custom-entity-models-cem))
-- Custom entity model part animations in 3D ([CEM for Fabric](https://www.curseforge.com/minecraft/mc-mods/custom-entity-models-cem))
+- Fully Custom GUI
+- Custom entity models ([EMF](https://modrinth.com/mod/entity-model-features))
+- Custom entity model part animations in 3D ([EMF](https://modrinth.com/mod/entity-model-features))
 - Any other MCPatcher/OptiFine resource pack feature such as connected textures, etc
 
 **These features WILL NEVER be implemented in Animatica.** <br/>
