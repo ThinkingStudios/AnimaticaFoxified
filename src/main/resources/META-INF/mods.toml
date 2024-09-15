@@ -24,11 +24,11 @@ modId = "neoforge"
 type = "required"
 versionRange = "[20.2,20.4]"
 ordering = "NONE"
-side = "SERVER"
+side = "CLIENT"
 
 [[dependencies.animatica]]
 modId = "minecraft"
 type = "required"
 versionRange = "[1.20.2,1.20.4]"
 ordering = "NONE"
-side = "SERVER"
+side = "CLIENT"
