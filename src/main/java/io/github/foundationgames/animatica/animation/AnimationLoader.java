@@ -2,12 +2,13 @@ package io.github.foundationgames.animatica.animation;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.foundationgames.animatica.Animatica;
+import io.github.foundationgames.animatica.config.AnimaticaConfig;
 import io.github.foundationgames.animatica.util.Flags;
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.SynchronousResourceReloader;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public final class AnimationLoader implements SimpleSynchronousResourceReloadListener {
+public final class AnimationLoader implements SynchronousResourceReloader {
     public static final String[] ANIM_PATHS = {
             "animatica/anim",
             "mcpatcher/anim",
@@ -58,16 +59,11 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
     }
 
     @Override
-    public Identifier getFabricId() {
-        return ID;
-    }
-
-    @Override
     public void reload(ResourceManager manager) {
         this.animatedTextures.clear();
         this.animationIds.clear();
 
-        if (!Animatica.CONFIG.animatedTextures) {
+        if (!AnimaticaConfig.ANIMATED_TEXTURES.get()) {
             return;
         }
 

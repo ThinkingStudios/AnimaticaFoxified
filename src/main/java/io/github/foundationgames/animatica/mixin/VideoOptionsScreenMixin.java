@@ -1,6 +1,6 @@
 package io.github.foundationgames.animatica.mixin;
 
-import io.github.foundationgames.animatica.Animatica;
+import io.github.foundationgames.animatica.config.AnimaticaConfig;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.VideoOptionsScreen;
 import net.minecraft.client.option.SimpleOption;
@@ -26,7 +26,7 @@ public abstract class VideoOptionsScreenMixin extends Screen {
     private SimpleOption<?>[] animatica$addTextureAnimationOptionButton(SimpleOption<?>[] old) {
         var options = new SimpleOption<?>[old.length + 1];
         System.arraycopy(old, 0, options, 0, old.length);
-        options[options.length - 1] = Animatica.CONFIG.getAnimatedTexturesOption();
+        options[options.length - 1] = AnimaticaConfig.VanillaExtended.getAnimatedTexturesOption();
         return options;
     }
 }
