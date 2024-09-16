@@ -19,7 +19,6 @@ public class AnimaticaConfig {
 
     static {
         BUILDER = new ModConfigSpec.Builder();
-        BUILDER.push("animatica");
         ANIMATED_TEXTURES = BUILDER.translation("option.animatica.animated_textures").define("animated_textures", true);
         SPEC = BUILDER.build();
     }
@@ -52,7 +51,7 @@ public class AnimaticaConfig {
                     .setId(Animatica.id("animated_textures"))
                     .add(OptionImpl.createBuilder(Boolean.TYPE, sodiumOpts)
                             .setName(Text.translatable("option.animatica.animated_textures"))
-                            .setTooltip(Text.of(""))
+                            //.setTooltip(Text.of(""))
                             .setControl(TickBoxControl::new)
                             .setBinding((sodiumGameOptions, aBoolean) -> AnimaticaConfig.ANIMATED_TEXTURES.set(aBoolean), sodiumGameOptions -> AnimaticaConfig.ANIMATED_TEXTURES.get())
                             .setImpact(OptionImpact.VARIES)
