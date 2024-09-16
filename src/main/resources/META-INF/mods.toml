@@ -22,13 +22,13 @@ config = "animatica.mixins.json"
 [[dependencies.animatica]]
 modId = "neoforge"
 type = "required"
-versionRange = "[20.2,20.4)"
+versionRange = "[20.2,20.5)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.animatica]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.20.2,1.20.4)"
+versionRange = "[1.20.2,1.20.5)"
 ordering = "NONE"
 side = "CLIENT"
