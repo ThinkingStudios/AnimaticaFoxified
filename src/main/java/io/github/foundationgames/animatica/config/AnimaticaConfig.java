@@ -19,7 +19,6 @@ public class AnimaticaConfig {
 
     static {
         BUILDER = new ModConfigSpec.Builder();
-        BUILDER.push("animatica");
         ANIMATED_TEXTURES = BUILDER.translation("option.animatica.animated_textures").define("animated_textures", true);
         SPEC = BUILDER.build();
     }

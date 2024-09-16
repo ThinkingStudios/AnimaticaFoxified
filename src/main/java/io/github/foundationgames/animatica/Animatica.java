@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.embeddedt.embeddium.api.OptionPageConstructionEvent;
 import org.embeddedt.embeddium.client.gui.options.StandardOptions;
 
+import java.util.Locale;
+
 @Mod(value = Animatica.NAMESPACE, dist = Dist.CLIENT)
 public class Animatica {
     public static final Logger LOG = LogManager.getLogger("Animatica");
@@ -34,7 +36,7 @@ public class Animatica {
                 event.registerReloadListener(AnimationLoader.INSTANCE);
             });
 
-            modContainer.registerConfig(ModConfig.Type.CLIENT, AnimaticaConfig.SPEC);
+            modContainer.registerConfig(ModConfig.Type.CLIENT, AnimaticaConfig.SPEC, String.format(Locale.ROOT, "%s.toml", NAMESPACE));
 
             if (ModList.get().isLoaded("embeddium")) {
                 OptionPageConstructionEvent.BUS.addListener(event -> {
