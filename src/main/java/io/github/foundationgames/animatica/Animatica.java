@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.embeddedt.embeddium.api.OptionPageConstructionEvent;
 import org.embeddedt.embeddium.client.gui.options.StandardOptions;
 
+import java.util.Locale;
+
 @Mod(Animatica.NAMESPACE)
 public class Animatica {
     public static final Logger LOG = LogManager.getLogger("Animatica");
@@ -26,6 +28,8 @@ public class Animatica {
 
     public Animatica(IEventBus modEventBus) {
         if (FMLLoader.getDist().isClient()) {
+            ModLoadingContext context = ModLoadingContext.get();
+
             NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, TickEvent.ClientTickEvent.class, event -> {
                 if (event.phase == TickEvent.Phase.START) {
                     AnimationLoader.INSTANCE.tickTextures();
@@ -36,8 +40,8 @@ public class Animatica {
                 event.registerReloadListener(AnimationLoader.INSTANCE);
             });
 
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, AnimaticaConfig.SPEC);
-            ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
+            context.registerConfig(ModConfig.Type.CLIENT, AnimaticaConfig.SPEC, String.format(Locale.ROOT, "%s.toml", NAMESPACE));
+            context.registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
 
             if (ModList.get().isLoaded("embeddium")) {
                 OptionPageConstructionEvent.BUS.addListener(event -> {
