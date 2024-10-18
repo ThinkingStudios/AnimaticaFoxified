@@ -43,17 +43,17 @@ public class AnimaticaConfig {
     }
 
     public static class EmbeddiumExtended {
-        private static final EmbeddiumOptionsStorage sodiumOpts = new EmbeddiumOptionsStorage();
+        private static final EmbeddiumOptionsStorage embeddiumOpts = new EmbeddiumOptionsStorage();
         private static final OptionGroup animatedTextures;
 
         static {
             animatedTextures = OptionGroup.createBuilder()
                     .setId(Animatica.id("animated_textures"))
-                    .add(OptionImpl.createBuilder(Boolean.TYPE, sodiumOpts)
+                    .add(OptionImpl.createBuilder(Boolean.TYPE, embeddiumOpts)
                             .setName(Text.translatable("option.animatica.animated_textures"))
                             //.setTooltip(Text.of(""))
                             .setControl(TickBoxControl::new)
-                            .setBinding((sodiumGameOptions, aBoolean) -> AnimaticaConfig.ANIMATED_TEXTURES.set(aBoolean), sodiumGameOptions -> AnimaticaConfig.ANIMATED_TEXTURES.get())
+                            .setBinding((embeddiumOptions, aBoolean) -> AnimaticaConfig.ANIMATED_TEXTURES.set(aBoolean), embeddiumOptions -> AnimaticaConfig.ANIMATED_TEXTURES.get())
                             .setImpact(OptionImpact.VARIES)
                             .setFlags(new OptionFlag[]{OptionFlag.REQUIRES_ASSET_RELOAD})
                             .build()

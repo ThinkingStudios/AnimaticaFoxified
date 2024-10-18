@@ -2,12 +2,14 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.foundationgames.animatica.mixin",
+  "plugin": "io.github.foundationgames.animatica.mixin.AnimaticaMixinConfigPlugin",
   "compatibilityLevel": "JAVA_16",
   "client": [
     "IdentifierMixin",
     "NativeImageAccessor",
     "RenderSystemMixin",
-    "VideoOptionsScreenMixin"
+    "VideoOptionsScreenMixin",
+    "sodium.SodiumGameOptionPagesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
