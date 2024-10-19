@@ -1,6 +1,8 @@
 package io.github.foundationgames.animatica.mixin.sodium;
 
 import io.github.foundationgames.animatica.config.AnimaticaConfig;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptionPages;
 import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptions;
 import net.caffeinemc.mods.sodium.client.gui.options.*;
@@ -19,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
+@Restriction(require = @Condition("sodium"))
 @Mixin(value = SodiumGameOptionPages.class, remap = false)
 public abstract class SodiumGameOptionPagesMixin {
     @Shadow @Final private static SodiumOptionsStorage sodiumOpts;
