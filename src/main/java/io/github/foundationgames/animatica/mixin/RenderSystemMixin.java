@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(RenderSystem.class)
 public class RenderSystemMixin {
-    @ModifyVariable(method = "_setShaderTexture(ILnet/minecraft/util/Identifier;)V", at = @At("HEAD"), index = 1, argsOnly = true)
+    @ModifyVariable(method = "setShaderTexture(ILnet/minecraft/util/Identifier;)V", at = @At("HEAD"), index = 1, argsOnly = true)
     private static Identifier animatica$replaceWithAnimatedTexture(Identifier old) {
         if (AnimaticaConfig.ANIMATED_TEXTURES.get()) {
             var anim = AnimationLoader.INSTANCE.getAnimationId(old);

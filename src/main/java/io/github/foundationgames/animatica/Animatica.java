@@ -7,7 +7,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLLoader;
@@ -18,8 +17,6 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.embeddedt.embeddium.api.OptionPageConstructionEvent;
-import org.embeddedt.embeddium.api.options.structure.StandardOptions;
 
 import java.util.Locale;
 
@@ -40,14 +37,6 @@ public class Animatica {
 
             modContainer.registerConfig(ModConfig.Type.CLIENT, AnimaticaConfig.SPEC, String.format(Locale.ROOT, "%s.toml", NAMESPACE));
             modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-
-            if (ModList.get().isLoaded("embeddium")) {
-                OptionPageConstructionEvent.BUS.addListener(event -> {
-                    if (event.getId().matches(StandardOptions.Pages.GENERAL)) {
-                        event.addGroup(AnimaticaConfig.EmbeddiumExtended.getAnimatedTextures());
-                    }
-                });
-            }
         }
     }
 
