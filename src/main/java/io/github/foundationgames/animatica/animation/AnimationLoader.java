@@ -94,7 +94,8 @@ public final class AnimationLoader implements SynchronousResourceReloader {
                         var animId = Identifier.of(targetId.getNamespace(), targetId.getPath() + "-anim");
                         this.animationIds.put(targetId, animId);
                         this.animatedTextures.add(tex);
-                        tex.registerTexture(MinecraftClient.getInstance().getTextureManager(), manager, animId, MinecraftClient.getInstance());
+                        var textureManager = MinecraftClient.getInstance().getTextureManager();
+                        textureManager.registerTexture(animId, tex);
                     });
         }
 
